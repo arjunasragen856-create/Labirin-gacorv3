@@ -1,37 +1,29 @@
-import Stack, { VStack } from '@nkzw/stack';
-import { Stack as ExpoStack } from 'expo-router';
-import { fbs } from 'fbtee';
-import { Text, View } from 'react-native';
-import { cx } from '../../../lib/cx.tsx';
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, TouchableOpacity, Alert, Dimensions } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 
-export default function Index() {
-  return (
-    <>
-      <ExpoStack.Screen options={{ title: String(fbs('Home', 'Home header title')) }} />
-      <VStack alignCenter center flex1 gap={16} padding>
-        <Text className="text-center text-xl font-bold text-accent">
-          <fbt desc="Greeting">Welcome</fbt>
-        </Text>
-        <Text className="text-center italic">
-          <fbt desc="Tagline">Modern, sensible defaults, fast.</fbt>
-        </Text>
-        <Stack alignCenter center gap={4}>
-          <Text className="text-center">
-            <fbt desc="Live update message">
-              Change{' '}
-              <View
-                className={cx(
-                  'border-accent bg-subtle inline-flex rounded border p-1',
-                  'android:translate-y-[9px] ios:translate-y-[9px]',
-                )}
-              >
-                <Text>src/app/(app)/(tabs)/index.tsx</Text>
-              </View>{' '}
-              for live updates.
-            </fbt>
-          </Text>
-        </Stack>
-      </VStack>
-    </>
-  );
-}
+const { width, height } = Dimensions.get('window');
+const SIZE = 10;
+const CELL = Math.floor(Math.min(width, height - 200) / SIZE);
+
+export default function App() {
+  const [player, setPlayer] = useState({ x: 0, y: 0 });
+  const [goal] = useState({ x: SIZE - 1, y: SIZE - 1 });
+  const [maze] = useState(generateMaze());
+  const [steps, setSteps] = useState(0);
+
+  function generateMaze() {
+    const m = Array(SIZE).fill(0).map(() => Array(SIZE).fill(1));
+    for (let i = 0; i < SIZE; i++) {
+      for (let j = 0; j < SIZE; j++) {
+        if (Math.random() > 0.7) m[i][j] = 0;
+      }
+    }
+    m[0][0] = 0;
+    m[SIZE - 1][SIZE - 1] = 0;
+    return m;
+  }
+
+  const move = (dx: number, dy: number) => {
+    const newX = player.x + dx;
+    const newY =
